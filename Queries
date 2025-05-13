@@ -82,3 +82,18 @@ GROUP BY 1
 ORDER BY 2 DESC
 LIMIT 10;
 
+Q Which year had the highest number of content releases?
+SELECT release_year, COUNT(*) AS total_released
+FROM netflix
+GROUP BY release_year
+ORDER BY total_released DESC
+LIMIT 1;
+
+Q Which country produces the most Netflix content?
+SELECT country, COUNT(*) AS total
+FROM netflix
+WHERE country IS NOT NULL
+GROUP BY country
+ORDER BY total DESC
+LIMIT 5;
+
