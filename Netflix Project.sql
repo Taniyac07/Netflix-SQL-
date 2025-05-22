@@ -1,0 +1,84 @@
+CREATE TABLE netflix(
+  show_id VARCHAR(10),
+  type VARCHAR(10),
+  title	VARCHAR(150),
+  director VARCHAR(210),
+  casts	VARCHAR(1000),
+  country VARCHAR(150),
+  date_added VARCHAR(50),
+  release_year INT,
+  rating VARCHAR(10),
+  duration	VARCHAR(15),
+  listed_in VARCHAR(100),
+  description VARCHAR(300)
+);
+
+SELECT * FROM netflix;
+
+SELECT COUNT(*) as total_content from netflix;
+
+-- Count the number of Movies vs TV Shows
+SELECT type,COUNT(*) as total_content from netflix
+GROUP BY type
+
+--Find the most common rating for movies and TV shows
+SELECT type,rating, COUNT(*) from netflix
+GROUP BY 1,2
+ORDER BY 1, 3 DESC;
+
+--List all movies released in a specific year (e.g., 2020)
+SELECT * from netflix
+WHERE type = 'Movie' AND
+release_year = 2020;
+
+--Identify the longest movie
+SELECT type, title, duration FROM netflix
+WHERE type = 'Movie'
+AND 
+duration = (SELECT MAX(duration) from netflix);
+
+--Find content added in the last 5 years
+SELECT * FROM netflix
+WHERE  TO_DATE(date_added, 'Month DD, YYYY') >= CURRENT_DATE - INTERVAL '5 years';
+
+--List all TV shows with more than 5 seasons
+SELECT * FROM netflix
+WHERE 
+	TYPE = 'TV Show'
+	AND
+	SPLIT_PART(duration, ' ', 1)::INT > 5
+
+--List all movies that are documentaries
+SELECT * FROM netflix
+WHERE listed_in LIKE '%Documentaries';
+
+--Find all content without a director
+SELECT * FROM netflix
+WHERE director is NULL;
+
+--Find the top 10 actors who have appeared in the highest number of movies produced in India.
+SELECT 
+--show_id,casts,
+UNNEST(STRING_TO_ARRAY(casts, ',')) AS actors,
+COUNT(*) AS total_content
+from netflix
+WHERE country ILIKE '%india'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10;
+
+--Which year had the highest number of content releases?
+SELECT release_year, COUNT(*) AS total_released
+FROM netflix
+GROUP BY release_year
+ORDER BY total_released DESC
+LIMIT 1;
+
+--Which country produces the most Netflix content?
+SELECT country, COUNT(*) AS total
+FROM netflix
+WHERE country IS NOT NULL
+GROUP BY country
+ORDER BY total DESC
+LIMIT 5;
+
